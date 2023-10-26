@@ -1,0 +1,17 @@
+# @format
+
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+url: "https://cheehengk.github.io/" # the base hostname & protocol for your site, e.g. http://example.com
+baseurl: "" # the subpath of your site, e.g. /blog
+title: "cheehengk" # the name of your site, e.g. ACME Corp.
+tagline: "Chee Heng Koh"
+description: ""
+logo: /favicon.png
+social:
+  name: Chee Heng Koh
+  links:
+    - https://www.linkedin.com/in/cheehengk/
+    - https://github.com/cheehengk
