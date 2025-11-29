@@ -31,7 +31,7 @@
 .timeline {
   margin: 4em auto;
   position: relative;
-  max-width: 46em;
+  max-width: 80em;
 }
 
 .timeline:before {
