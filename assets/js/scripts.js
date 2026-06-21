@@ -1,178 +1,95 @@
 /** @format */
 
-var currentSection = "welcome";
+(function () {
+  "use strict";
 
-function highlight(e) {
-  var elements = document.getElementsByClassName("nav-buttons");
-  Array.prototype.forEach.call(elements, (el) =>
-    el.classList.remove("selected-nav-button")
-  );
-  e.classList.add("selected-nav-button");
-}
+  var nav = document.getElementById("nav");
+  var toggle = document.getElementById("nav-toggle");
+  var mobile = document.getElementById("nav-mobile");
 
-function highlightMobile(e) {
-  var elements = document.getElementsByClassName("menu-button");
-  Array.prototype.forEach.call(elements, (el) => {
-    el.classList.remove("btn-dark");
-    el.classList.add("btn-outline-dark");
+  /* Sticky nav border on scroll */
+  function onScroll() {
+    if (window.scrollY > 8) nav.classList.add("is-scrolled");
+    else nav.classList.remove("is-scrolled");
+  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
+  /* Mobile menu */
+  function closeMobile() {
+    mobile.classList.remove("is-open");
+    toggle.classList.remove("is-open");
+    toggle.setAttribute("aria-expanded", "false");
+  }
+  toggle.addEventListener("click", function () {
+    var open = mobile.classList.toggle("is-open");
+    toggle.classList.toggle("is-open", open);
+    toggle.setAttribute("aria-expanded", String(open));
   });
-  e.classList.remove("btn-outline-dark");
-  e.classList.add("btn-dark");
-}
+  Array.prototype.forEach.call(
+    mobile.querySelectorAll(".nav__mobile-link"),
+    function (link) {
+      link.addEventListener("click", closeMobile);
+    }
+  );
 
-function openMenu() {
-  document.getElementById("menu").style.animationName = "moverightmenu";
-  document.getElementById("menu").style.animationDuration = ".5s";
-  document.getElementById("menu").style.animationFillMode = "forward";
-  document.getElementById("menu").style.transform = "translateX(0px)";
-  document.getElementById("overlay").style.display = "block";
-}
+  /* Scrollspy — highlight active nav link */
+  var links = Array.prototype.slice.call(document.querySelectorAll(".nav__link"));
+  var sections = links
+    .map(function (l) {
+      return document.getElementById(l.getAttribute("data-nav"));
+    })
+    .filter(Boolean);
 
-function closemenu() {
-  document.getElementById("menu").style.animationName = "movebackmenu";
-  document.getElementById("menu").style.animationDuration = ".5s";
-  document.getElementById("menu").style.animationFillMode = "forward";
-  document.getElementById("menu").style.transform = "translateX(100vw)";
-  document.getElementById("overlay").style.display = "none";
-}
+  if ("IntersectionObserver" in window && sections.length) {
+    var spy = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          links.forEach(function (l) {
+            l.classList.toggle(
+              "is-active",
+              l.getAttribute("data-nav") === e.target.id
+            );
+          });
+        });
+      },
+      { rootMargin: "-45% 0px -50% 0px", threshold: 0 }
+    );
+    sections.forEach(function (s) {
+      spy.observe(s);
+    });
+  }
 
-// When the user scrolls the page, execute myFunction
-window.onscroll = function () {
-  myFunction();
-};
-
-$(document).ready(function () {
-  myFunction();
-});
-
-function myFunction() {
-  var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-  var height =
-    document.documentElement.scrollHeight -
-    document.documentElement.clientHeight;
-  var scrolled = (winScroll / height) * 100;
-  if (scrolled == 0) {
-    document.querySelector("nav").style.boxShadow = "none";
-    document.querySelector("nav").style.backgroundColor = "#f8f9fa";
-    document.querySelector(".progress-container").style.display = "none";
+  /* Scroll reveal */
+  var revealTargets = document.querySelectorAll(
+    ".entry, .skills__group, .hero__inner"
+  );
+  Array.prototype.forEach.call(revealTargets, function (el) {
+    el.classList.add("reveal");
+  });
+  if ("IntersectionObserver" in window) {
+    var revealer = new IntersectionObserver(
+      function (entries, obs) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            e.target.classList.add("is-visible");
+            obs.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+    Array.prototype.forEach.call(revealTargets, function (el) {
+      revealer.observe(el);
+    });
   } else {
-    document.querySelector("nav").style.boxShadow =
-      "rgb(0 0 0 / 20%) 0px 4px 8px 0px, rgb(0 0 0 / 19%) 0px 6px 20px 0px";
-    document.querySelector("nav").style.backgroundColor = "#fefcff";
-    document.querySelector(".progress-container").style.display = "block";
+    Array.prototype.forEach.call(revealTargets, function (el) {
+      el.classList.add("is-visible");
+    });
   }
-  document.getElementById("myBar").style.width = scrolled + "%";
-  if (document.getElementById("experience").getBoundingClientRect().top < 15) {
-    if (currentSection == "experience") return;
-    highlight(document.getElementById("experience-button"));
-    highlightMobile(document.getElementById("experience-button-mobile"));
-    currentSection = "experience";
-  } else if (
-    document.getElementById("projects").getBoundingClientRect().top < 15
-  ) {
-    if (currentSection == "projects") return;
-    highlight(document.getElementById("projects-button"));
-    highlightMobile(document.getElementById("projects-button-mobile"));
-    currentSection = "projects";
-  } else if (
-    document.getElementById("skills").getBoundingClientRect().top < 15
-  ) {
-    if (currentSection == "skills") return;
-    highlight(document.getElementById("skills-button"));
-    highlightMobile(document.getElementById("skills-button-mobile"));
-    currentSection = "skills";
-  } else if (
-    document.getElementById("welcome").getBoundingClientRect().top < 15
-  ) {
-    if (currentSection == "welcome") return;
-    highlight(document.getElementById("about-button"));
-    highlightMobile(document.getElementById("about-button-mobile"));
-    currentSection = "welcome";
-  }
-}
 
-function educationSelector(e) {
-  $(e).animate({
-    borderWidth: "1px"
-  }, 75, "swing", () => {
-    $(".experience-container").animate({
-      borderWidth: "0px"
-    }, 75, "swing")
-    $(".awards-container").animate({
-      borderWidth: "0px"
-    }, 75, "swing")
-  })
-
-  $("#awards-timeline").animate({
-    opacity: 0
-  }, 75, "swing")
-  $("#experience-timeline").animate({
-    opacity: 0
-  }, 75, "swing", () => {
-    document.querySelector('#experience-timeline').style.display = "none"
-    document.querySelector('#awards-timeline').style.display = "none"
-    document.querySelector('#education-timeline').style.display = "block"
-    $("#education-timeline").animate({
-      opacity: 1
-    }, 75, "swing")
-  })
-}
-
-function experienceSelector(e) {
-  $(e).animate({
-    borderWidth: "1px"
-  }, 75, "swing", () => {
-    $(".education-container").animate({
-      borderWidth: "0px"
-    }, 75, "swing")
-    $(".awards-container").animate({
-      borderWidth: "0px"
-    }, 75, "swing")
-  })
-
-  $("#awards-timeline").animate({
-    opacity: 0
-  }, 75, "swing")
-  $("#education-timeline").animate({
-    opacity: 0
-  }, 75, "swing", () => {
-    document.querySelector('#education-timeline').style.display = "none"
-    document.querySelector('#awards-timeline').style.display = "none"
-    document.querySelector('#experience-timeline').style.display = "block"
-    $("#experience-timeline").animate({
-      opacity: 1
-    }, 75, "swing")
-  })
-}
-
-function awardsSelector(e) {
-  $(e).animate({
-    borderWidth: "1px"
-  }, 75, "swing", () => {
-    $(".education-container").animate({
-      borderWidth: "0px"
-    }, 75, "swing")
-    $(".experience-container").animate({
-      borderWidth: "0px"
-    }, 75, "swing")
-  })
-
-  $("#experience-timeline").animate({
-    opacity: 0
-  }, 75, "swing")
-  $("#education-timeline").animate({
-    opacity: 0
-  }, 75, "swing", () => {
-    document.querySelector('#education-timeline').style.display = "none"
-    document.querySelector('#awards-timeline').style.display = "block"
-    document.querySelector('#experience-timeline').style.display = "none"
-    $("#awards-timeline").animate({
-      opacity: 1
-    }, 75, "swing")
-  })
-}
-
-window.addEventListener("load", function () {
-  const loadingScreen = document.getElementById("loading-screen");
-  loadingScreen.style.display = "none";
-});
+  /* Footer year */
+  var yr = document.getElementById("year");
+  if (yr) yr.textContent = new Date().getFullYear();
+})();
