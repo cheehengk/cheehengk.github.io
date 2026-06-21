@@ -285,6 +285,19 @@ a { color: inherit; text-decoration: none; }
   .nav__links { display: none; }
   .nav__toggle { display: flex; }
   .entry__head { gap: .25rem; }
+
+  /* Tighten vertical rhythm on small screens — the full-height hero and
+     stacked section padding leave large empty gaps on phones. */
+  .hero {
+    min-height: auto;
+    padding-top: 6.5rem;
+    padding-bottom: 2.75rem;
+  }
+  .section {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+  .section__title { margin-bottom: 1.75rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
